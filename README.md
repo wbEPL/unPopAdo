@@ -1,18 +1,44 @@
-# wbTemplate
+# unPopAdo
 
-Template repository for the standard World Bank work.
+A Stata `.ado` command that loads UN WPP2024 population estimates and
+projections for one or more countries directly into memory -- from a
+local checkout or straight off GitHub, no download step required.
 
 ## About
 
-This repository serves as a template for World Bank projects. It provides a standard structure and configuration for new repositories, including license files, gitignore settings, and documentation.
+`un_pop` reads the pre-cleaned UN WPP2024 "Population on 1 January by
+5-year age group and sex" data produced by the companion
+[unPopData](https://github.com/wbEPL/unPopData) repository, and returns
+one long-format dataset (country x year x 5-year age group x sex) per
+call, with country identifiers and the projection variant name already
+merged in. See [`un_pop.ado`](un_pop.ado) for the full option reference
+and design notes, or run `help un_pop` once the .ado is on your adopath.
+
+```stata
+* Single country, default root (GitHub) and variant (Medium)
+un_pop, country(GNB)
+
+* Multiple countries, explicit variant
+un_pop, country("GNB SEN COL") variant(Medium)
+
+* Local checkout of unPopData instead of GitHub
+un_pop, country(GNB) root("../unPopData/clean")
+```
+
+Run [`test_un_pop.do`](test_un_pop.do) for the full smoke- and
+edge-case test suite (bad country/variant codes, unreachable root,
+comma- vs space-separated country lists, etc.).
 
 ## Getting Started
 
-1. Use this template to create a new repository by clicking **"Use this template"** on GitHub.
-2. Update this `README.md` with your project's name and description.
-3. Add relevant **topics** to the repository (via the repository Settings or the About section on GitHub).
-4. Add a **website link** in the repository's About section (if a project website is available).
-5. Review and update the `LICENSE` and [World Bank IGO Rider](WB-IGO-RIDER.md) as needed.
+1. Clone this repo (or copy `un_pop.ado` + `un_pop.sthlp` onto your
+   `adopath`).
+2. Call `un_pop, country(<ISO3>)` -- it works with no local data at all,
+   since it defaults to reading straight from the unPopData GitHub repo.
+3. Pass `root()` to point at a local checkout of
+   [unPopData](https://github.com/wbEPL/unPopData) instead, e.g. for
+   offline use.
+4. Review and update the `LICENSE` and [World Bank IGO Rider](WB-IGO-RIDER.md) as needed.
 
 ## License
 
