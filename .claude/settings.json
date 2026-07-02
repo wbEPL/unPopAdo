@@ -1,0 +1,6 @@
+{
+  "enabledPlugins": {
+    "stata-analyst@social-data-analysis": false,
+    "stata@stata-skill": false
+  }
+}
