@@ -83,24 +83,29 @@ VARIANT(string)   UN projection variant name. Optional, defaults to
 --------------------------------------------------------------------------
 OUTPUT (left in memory, not saved to disk)
 --------------------------------------------------------------------------
-One row per country x year x 5-year age group x sex:
+One row per country x year x 5-year age group x sex. Variable names are
+carried over unchanged from the source files (no renaming); only
+iso3_code, location, iso2_code and locid are new, merged in from
+lookup_countries:
 
-    country     ISO3 code                       (from lookup_countries)
-    location    country / area name              (from lookup_countries)
-    iso2_code   ISO2 code                        (from lookup_countries)
-    locid       UN location ID                   (from lookup_countries)
-    variant     requested variant name, applied to BOTH the historical
-                and projection rows so the series reads as one continuous
-                scenario (from lookup_scenarios)
-    varid       UN VarID of the row's source file (0 = historical)
-    year        calendar year (1 January), 1950 onward
-    cohort      5-year age group, start age (0, 5, 10, ..., 100)
-    gender      sex, labelled 1 = Male, 2 = Female
-    edu_level   always "" -- reserved for Phase-3 harmonization, not built
-                yet (see .docs/restructure-design.md Section 2.3 B, 9)
-    value       population count, in thousands
+    iso3_code    ISO3 code                       (from lookup_countries)
+    location     country / area name              (from lookup_countries)
+    iso2_code    ISO2 code                        (from lookup_countries)
+    locid        UN location ID                   (from lookup_countries /
+                                                     <ISO3>.dta)
+    variant      requested variant name, applied to BOTH the historical
+                 and projection rows so the series reads as one continuous
+                 scenario (from lookup_scenarios)
+    varid        UN VarID of the row's source file (0 = historical)
+                                                     (from <ISO3>.dta)
+    time         calendar year (1 January), 1950 onward
+                                                     (from <ISO3>.dta)
+    agegrpstart  5-year age group, start age (0, 5, 10, ..., 100)
+                                                     (from <ISO3>.dta)
+    sex          labelled 1 = Male, 2 = Female     (from <ISO3>.dta)
+    pop          population count, in thousands    (from <ISO3>.dta)
 
-Sorted by country variant year cohort gender.
+Sorted by iso3_code variant time agegrpstart sex.
 
 --------------------------------------------------------------------------
 EXAMPLES
@@ -122,10 +127,13 @@ CHANGES FROM v1.0.0
   - Reads unPopData's one-file-per-country layout (lookup_countries.dta /
     lookup_scenarios.dta / <ISO3>.dta) instead of the older single
     baseline_population_1950_2023.csv + projection_<scenario>.csv layout.
-  - country/location/iso2_code/locid are merged in from lookup_countries;
-    cohort is now the numeric age-group start (agegrpstart) rather than
-    the UN's string AgeGrp label (e.g. "0-4"), since that is what the new
-    source files carry.
+  - location/iso2_code/locid are merged in from lookup_countries; all
+    other variables (iso3_code, varid, time, agegrpstart, sex, pop) keep
+    the exact names they have in the source .dta files -- no renaming to
+    a country/year/cohort/gender/value schema, and no edu_level
+    placeholder (this source has no education dimension). agegrpstart is
+    the numeric age-group start rather than the UN's string AgeGrp label
+    (e.g. "0-4"), since that is what the new source files carry.
 */
 
 cap program drop un_pop
@@ -242,29 +250,21 @@ if _rc {
 }
 drop _merge
 
-*# 7. Standardize names, order, sort --------------------------------------------
-rename iso3_code    country
-rename time         year
-rename agegrpstart  cohort
-rename sex          gender
-rename pop          value
-gen    edu_level = ""
+*# 7. Order & sort -- original per-country variable names are preserved --------
+keep  iso3_code location iso2_code locid variant varid time agegrpstart sex pop
+order iso3_code location iso2_code locid variant varid time agegrpstart sex pop
+sort  iso3_code variant time agegrpstart sex
 
-keep  country location iso2_code locid variant varid year cohort gender edu_level value
-order country location iso2_code locid variant varid year cohort gender edu_level value
-sort  country variant year cohort gender
-
-label variable country    "ISO3 country code"
-label variable location   "Country / area name (UN WPP)"
-label variable iso2_code  "ISO2 country code"
-label variable locid      "UN location ID"
-label variable variant    "Projection variant / simulation version"
-label variable varid      "UN VarID of the source row (0 = shared historical row)"
-label variable year       "Calendar year (1 January)"
-label variable cohort     "5-year age group, start age (0, 5, ..., 100)"
-label variable gender     "Sex (1 = Male, 2 = Female)"
-label variable edu_level  "Education level (not populated; reserved for harmonization)"
-label variable value      "Population, thousands"
+label variable iso3_code   "ISO3 country code"
+label variable location    "Country / area name (UN WPP)"
+label variable iso2_code   "ISO2 country code"
+label variable locid       "UN location ID"
+label variable variant     "Projection variant / simulation version"
+label variable varid       "UN VarID of the source row (0 = shared historical row)"
+label variable time        "Calendar year (1 January)"
+label variable agegrpstart "5-year age group, start age (0, 5, ..., 100)"
+label variable sex         "Sex (1 = Male, 2 = Female)"
+label variable pop         "Population, thousands"
 
 di as text "----- un_pop: `n_countries' countries (`country_list') variant=`canon_variant' -> `=_N' obs in memory -----"
 

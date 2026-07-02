@@ -101,20 +101,22 @@ This is exactly the {bf:clean/} folder produced by
 
 {pstd}
 Left in memory, one row per country x year x 5-year age group x sex,
-sorted by country variant year cohort gender:
+sorted by iso3_code variant time agegrpstart sex. Variable names are
+carried over unchanged from the source files -- only {bf:iso3_code},
+{bf:location}, {bf:iso2_code} and {bf:locid} are new, merged in from
+{bf:lookup_countries}:
 
 {p2colset 9 20 22 2}{...}
-{p2col:{bf:country}}ISO3 country code{p_end}
+{p2col:{bf:iso3_code}}ISO3 country code{p_end}
 {p2col:{bf:location}}country / area name{p_end}
 {p2col:{bf:iso2_code}}ISO2 country code{p_end}
 {p2col:{bf:locid}}UN location ID{p_end}
 {p2col:{bf:variant}}requested variant name, applied to both historical and projection rows{p_end}
 {p2col:{bf:varid}}UN VarID of the source row (0 = historical){p_end}
-{p2col:{bf:year}}calendar year (1 January), 1950 onward{p_end}
-{p2col:{bf:cohort}}5-year age group, start age (0, 5, ..., 100){p_end}
-{p2col:{bf:gender}}sex, labelled 1 = Male, 2 = Female{p_end}
-{p2col:{bf:edu_level}}always "" -- reserved for future harmonization work{p_end}
-{p2col:{bf:value}}population, in thousands{p_end}
+{p2col:{bf:time}}calendar year (1 January), 1950 onward{p_end}
+{p2col:{bf:agegrpstart}}5-year age group, start age (0, 5, ..., 100){p_end}
+{p2col:{bf:sex}}labelled 1 = Male, 2 = Female{p_end}
+{p2col:{bf:pop}}population, in thousands{p_end}
 {p2colreset}{...}
 
 {marker examples}{...}
