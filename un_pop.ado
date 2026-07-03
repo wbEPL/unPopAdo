@@ -1,7 +1,14 @@
-*! version 2.0.0   Eduard Bukin ebukin@worldbank.org   2 Jul 2026
+*! version 2.1.0   Eduard Bukin ebukin@worldbank.org   2 Jul 2026
 /*
 un_pop: long-format UN WPP2024 population estimates/projections for one or
 more countries, under a single projection variant, left in memory.
+
+DISCLAIMER: un_pop is only a data interface. The population figures it
+returns are produced by the UN Population Division's World Population
+Prospects (https://population.un.org/wpp) -- we do not produce, verify,
+or take responsibility for the accuracy, completeness, or timeliness of
+that underlying data. The pre-cleaned copy read here is built and hosted
+in the companion unPopData repo: https://github.com/wbEPL/unPopData
 
 --------------------------------------------------------------------------
 SOURCE DATA
@@ -81,6 +88,33 @@ VARIANT(string)   UN projection variant name. Optional, defaults to
                   actually available in lookup_scenarios.dta.
 
 --------------------------------------------------------------------------
+ERRORS
+--------------------------------------------------------------------------
+  r(197)  option country() required
+          country() was omitted entirely (Stata's own syntax parser).
+
+  r(198)  country() cannot be blank.
+          country() was supplied but empty/whitespace only.
+
+  r(198)  Country code(s) not found in lookup_countries.dta: ...
+          One or more requested ISO3 codes don't exist. Nothing is
+          loaded for ANY country; the full iso3_code/location reference
+          table is printed.
+
+  r(198)  Variant '...' not available.
+          The requested variant isn't in lookup_scenarios.dta (this
+          includes requesting the reserved "Historical" baseline
+          directly). The list of available variants is printed.
+
+  r(601)  Could not load <file> from root '...'.
+          root() is unreachable, wrong, or there is no internet
+          connection (for a URL root).
+
+  r(9999) Internal error: ...
+          The source data no longer matches what this .ado expects
+          (schema drift) -- not user-fixable; see the unPopData repo.
+
+--------------------------------------------------------------------------
 OUTPUT (left in memory, not saved to disk)
 --------------------------------------------------------------------------
 One row per country x year x 5-year age group x sex. Variable names are
@@ -120,20 +154,25 @@ EXAMPLES
     un_pop, country(GNB) root("../unPopData/clean")
 
 --------------------------------------------------------------------------
-CHANGES FROM v1.0.0
+CHANGES
 --------------------------------------------------------------------------
+v0.1.0
+  - Removed the unused edu_level placeholder (this source has no
+    education dimension).
+  - All variables keep the exact names they have in the source .dta
+    files (iso3_code, varid, time, agegrpstart, sex, pop) -- no more
+    renaming to a country/year/cohort/gender/value schema. Only
+    location/iso2_code/locid are new, merged in from lookup_countries.
+
+v0.0.2 (from v0.0.1)
   - root() is now optional (defaults to GitHub) instead of mandatory.
   - country() now accepts multiple ISO3 codes, not just one.
   - Reads unPopData's one-file-per-country layout (lookup_countries.dta /
     lookup_scenarios.dta / <ISO3>.dta) instead of the older single
     baseline_population_1950_2023.csv + projection_<scenario>.csv layout.
-  - location/iso2_code/locid are merged in from lookup_countries; all
-    other variables (iso3_code, varid, time, agegrpstart, sex, pop) keep
-    the exact names they have in the source .dta files -- no renaming to
-    a country/year/cohort/gender/value schema, and no edu_level
-    placeholder (this source has no education dimension). agegrpstart is
-    the numeric age-group start rather than the UN's string AgeGrp label
-    (e.g. "0-4"), since that is what the new source files carry.
+  - agegrpstart is the numeric age-group start rather than the UN's
+    string AgeGrp label (e.g. "0-4"), since that is what the new source
+    files carry.
 */
 
 cap program drop un_pop

@@ -1,10 +1,12 @@
 {smcl}
-{* *! version 2.0.0  2 Jul 2026}{...}
+{* *! version 0.1.0  2 Jul 2026}{...}
 {viewerjumpto "Syntax" "un_pop##syntax"}{...}
 {viewerjumpto "Description" "un_pop##description"}{...}
+{viewerjumpto "Installation" "un_pop##install"}{...}
 {viewerjumpto "Options" "un_pop##options"}{...}
 {viewerjumpto "Root layout" "un_pop##root"}{...}
 {viewerjumpto "Stored output" "un_pop##output"}{...}
+{viewerjumpto "Errors" "un_pop##errors"}{...}
 {viewerjumpto "Examples" "un_pop##examples"}{...}
 {title:Title}
 
@@ -41,6 +43,25 @@ rows with the chosen variant's 2024-onward projection rows into one
 continuous series, then merges in country identifiers (from
 {bf:lookup_countries}) and the variant name (from {bf:lookup_scenarios}),
 so the returned data needs no further lookups.
+
+{pstd}
+{bf:Disclaimer.} {cmd:un_pop} is only a data {it:interface}. The
+population figures it returns are produced by the UN Population
+Division's {browse "https://population.un.org/wpp":World Population Prospects} (WPP2024); the authors of this command do not produce,
+verify, or take responsibility for the accuracy, completeness, or
+timeliness of that underlying data. The pre-cleaned copy read here is
+built and hosted in the companion {browse "https://github.com/wbEPL/unPopData":unPopData} repository.
+
+{marker install}{...}
+{title:Installation}
+
+{pstd}Any one of the following installs the same two files ({cmd:un_pop.ado}, {cmd:un_pop.sthlp}):{p_end}
+
+{phang2}1. Direct: {cmd:net install un_pop, from("https://raw.githubusercontent.com/wbEPL/unPopAdo/main/")}{p_end}
+{phang2}2. Via {browse "https://github.com/haghish/github":haghish/github}: {cmd:net install github, from("https://haghish.github.io/github/")} then {cmd:github install wbEPL/unPopAdo}{p_end}
+{phang2}3. Manual: clone {browse "https://github.com/wbEPL/unPopAdo"} and put the files on your {cmd:adopath}{p_end}
+
+{pstd}To remove: {cmd:ado uninstall un_pop}{p_end}
 
 {marker options}{...}
 {title:Options}
@@ -117,6 +138,18 @@ carried over unchanged from the source files -- only {bf:iso3_code},
 {p2col:{bf:agegrpstart}}5-year age group, start age (0, 5, ..., 100){p_end}
 {p2col:{bf:sex}}labelled 1 = Male, 2 = Female{p_end}
 {p2col:{bf:pop}}population, in thousands{p_end}
+{p2colreset}{...}
+
+{marker errors}{...}
+{title:Errors}
+
+{p2colset 9 20 22 2}{...}
+{p2col:{cmd:r(197)}}{cmd:option country() required} -- {cmd:country()} was omitted entirely{p_end}
+{p2col:{cmd:r(198)}}{cmd:country() cannot be blank.} -- {cmd:country()} was empty/whitespace only{p_end}
+{p2col:{cmd:r(198)}}{cmd:Country code(s) not found in lookup_countries.dta: ...} -- fix the code(s) using the printed reference table{p_end}
+{p2col:{cmd:r(198)}}{cmd:Variant '...' not available.} -- fix using the printed list of available variants ({bf:Historical} is never selectable){p_end}
+{p2col:{cmd:r(601)}}{cmd:Could not load <file> from root '...'.} -- {opt root()} is unreachable, wrong, or you are offline{p_end}
+{p2col:{cmd:r(9999)}}{cmd:Internal error: ...} -- the source data no longer matches this command's expectations (schema drift); not user-fixable{p_end}
 {p2colreset}{...}
 
 {marker examples}{...}

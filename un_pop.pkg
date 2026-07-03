@@ -1,0 +1,13 @@
+v 3
+d un_pop - UN WPP2024 population estimates and projections for one or more countries
+d
+d un_pop loads one row per country x year x 5-year age group x sex,
+d stacking historical estimates with the chosen UN projection variant and
+d merging in country identifiers, straight from GitHub or a local mirror.
+d
+d Distribution-Date: 02Jul2026
+d Author: Eduard Bukin, ebukin@worldbank.org
+d Support: email ebukin@worldbank.org
+
+f un_pop.ado
+f un_pop.sthlp
